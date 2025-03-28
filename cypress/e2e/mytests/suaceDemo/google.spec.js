@@ -21,27 +21,36 @@ describe('Google Test', () => {
 
         googleFunctions.VisitGoogle()
 
-        // Check language and components
-        let components = String(cy.get('div[id="SIvCob"] a')).includes("English") ? engComponents : espComponents
+        // Se ejecuta todo dentro del then porque el invoke es asincrono
+        // asi podemos asignar un valor a components y usarlo en las siguientes lineas
+        cy.get('div[id="SIvCob"] a').then(($link) => {
+            // Si el link indica que ingles esta disponible quiere decir que el idioma actual es español
+            const components = $link.text().includes("English") ? espComponents : engComponents;
 
-        cy.get('input[name="btnK"]').should('have.value', components.search).and('be.visible')
+            cy.get('input[name="btnK"]').should('have.value', components.search).and('be.visible')
 
-        cy.get('input[name="btnI"]').should('have.value', components.lucky).and('be.visible')
+            cy.get('input[name="btnI"]').should('have.value', components.lucky).and('be.visible')
 
-        cy.get('div[id="SIvCob"] a').should('contain', components.availableLanguages).and('be.visible')
-
-
-        cy.get('div[id="SIvCob"] a').should('be.visible').click()
-
-
-        components = String(cy.get('div[id="SIvCob"] a')).includes("Español") ? espComponents : engComponents
+            cy.get('div[id="SIvCob"] a').should('contain', components.availableLanguages).and('be.visible')
+        });
 
 
-        cy.get('input[name="btnK"]').should('have.value', components.search).and('be.visible')
+        // Cambiamos el idioma
+        cy.get('div[id="SIvCob"] a').click()
 
-        cy.get('input[name="btnI"]').should('have.value', components.lucky).and('be.visible')
 
-        cy.get('div[id="SIvCob"] a').should('contain', components.availableLanguages).and('be.visible')
+        // Volvemmos a ejecutar el codigo que asigna el idioma y los componentes
+        // se realizan vaalidaciones con el nuevo idioma
+        cy.get('div[id="SIvCob"] a').then(($link) => {
+
+            const components = $link.text().includes("English") ? espComponents : engComponents;
+
+            cy.get('input[name="btnK"]').should('have.value', components.search).and('be.visible')
+
+            cy.get('input[name="btnI"]').should('have.value', components.lucky).and('be.visible')
+
+            cy.get('div[id="SIvCob"] a').should('contain', components.availableLanguages).and('be.visible')
+        });
 
     })
 })
